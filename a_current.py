@@ -5,15 +5,34 @@ clock = pygame.time.Clock()
 running = True
 
 #Player
-player = pygame.image.load('/Users/luskousko/Desktop/Work/pics_pygame/cat.png').convert_alpha()
+player = pygame.image.load('/Users/luskousko/Desktop/Work/Work_Programko/pics_pygame/cat.png').convert_alpha()
 player = pygame.transform.scale(player,(100,100))
 flipping_player = player
 
 
 #Weapons
-lightsaber = pygame.image.load('/Users/luskousko/Desktop/Work/pics_pygame/lightsaber.png').convert_alpha()
+lightsaber = pygame.image.load('/Users/luskousko/Desktop/Work/Work_Programko/pics_pygame/lightsaber.png').convert_alpha()
 lightsaber = pygame.transform.scale(lightsaber,(80,80))
 lightsaber = pygame.transform.rotate(lightsaber,225)
+
+gun = pygame.image.load('/Users/luskousko/Desktop/Work/Work_Programko/pics_pygame/gun.png').convert_alpha()
+gun = pygame.transform.scale(gun, (80, 80))
+
+
+#Inventory ------------------------
+weapons = [{
+        "name": "lightsaber",
+        "image": lightsaber,
+        "base_rotation": 0,
+        "rotates": True,
+        "offset": (10, 10)},
+    
+        {"name": "gun",
+        "image": gun,
+        "base_rotation": 0,
+        "rotates": False,
+         "offset": (60, 40)}]
+current_weapon_index = 0
 
 
 #Variables 
@@ -26,6 +45,17 @@ pohyb_hore = False
 pohyb_dole = False
 pohyb_doprava = False
 pohyb_dolava = False
+
+def switch_weapon():
+    global current_weapon_index, angle
+    current_weapon_index = (current_weapon_index + 1) % len(weapons)
+    angle = 0
+
+def set_weapon(index):
+    global current_weapon_index, angle
+    if 0 <= index < len(weapons):
+        current_weapon_index = index
+        angle = 0
 
 
 def spracuj_keydown(event):
@@ -40,6 +70,14 @@ def spracuj_keydown(event):
         pohyb_doprava = True
     if event.key == pygame.K_SPACE:
         tocenie_meca = True
+        
+    #Switch weapon pressing E
+    if event.key == pygame.K_e:
+        switch_weapon() 
+    if event.key == pygame.K_1:
+        set_weapon(0)
+    if event.key == pygame.K_2:
+        set_weapon(1)
 
 
 def spracuj_keyup(event):
@@ -68,7 +106,9 @@ def pohyb_hraca():
     if pohyb_doprava:
         player_x += rychlost
         player = flipping_player
-    if tocenie_meca:
+
+    aktualna_zbran = weapons[current_weapon_index]
+    if tocenie_meca and aktualna_zbran["rotates"]:
         angle += 10
         
     #Border ------------------------------------------
@@ -99,8 +139,12 @@ while running:
     screen.blit(player, (player_x, player_y))
 
 
-    rotated_sword = pygame.transform.rotate(lightsaber, angle)
-    screen.blit(rotated_sword, (player_x + 70, player_y + 25))
+    aktualna_zbran = weapons[current_weapon_index]
+    weapon_image = aktualna_zbran["image"]
+    rotated_weapon = pygame.transform.rotate(weapon_image,aktualna_zbran["base_rotation"] + angle)
+    offset_x, offset_y = aktualna_zbran["offset"]
+    screen.blit(rotated_weapon, (player_x + offset_x, player_y + offset_y))
+
     pygame.display.update()
     clock.tick(60)
         
