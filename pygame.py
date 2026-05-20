@@ -46,6 +46,7 @@ pohyb_dole = False
 pohyb_doprava = False
 pohyb_dolava = False
 
+
 def switch_weapon():
     global current_weapon_index, angle
     current_weapon_index = (current_weapon_index + 1) % len(weapons)
